@@ -22,7 +22,7 @@ def _signal_handler(signum, frame):
 
 def main():
     if not firewall_controller.is_windows():
-        print("هذا البرنامج مخصص لنظام Windows فقط.")
+        print("This program is designed for Windows only.")
         sys.exit(1)
 
     atexit.register(cleanup_on_exit)

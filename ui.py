@@ -20,7 +20,7 @@ class AppRow(ctk.CTkFrame):
         self.label.grid(row=0, column=0, sticky="ew", padx=8)
 
         self.conn_label = ctk.CTkLabel(
-            self, text=f"{connection_count} اتصال", text_color="gray70"
+            self, text=f"{connection_count} conn", text_color="gray70"
         )
         self.conn_label.grid(row=0, column=1, padx=8)
 
@@ -30,7 +30,7 @@ class AppRow(ctk.CTkFrame):
         self.unblock_btn = None
         if status == "blocked" and self.on_unblock:
             self.unblock_btn = ctk.CTkButton(
-                self, text="فك الحظر", width=70, height=24,
+                self, text="Unblock", width=70, height=24,
                 fg_color="#d97706", hover_color="#b45309",
                 command=lambda: self.on_unblock(app_name)
             )
@@ -39,13 +39,13 @@ class AppRow(ctk.CTkFrame):
         self.update_row(connection_count, status)
 
     def update_row(self, connection_count, status):
-        self.conn_label.configure(text=f"{connection_count} اتصال")
+        self.conn_label.configure(text=f"{connection_count} conn")
 
         badge_config = {
-            "priority": {"text": " أولوية", "fg": "#2fa572", "text_color": "white"},
-            "blocked": {"text": " محظور", "fg": "#c0392b", "text_color": "white"},
-            "normal": {"text": "عادي", "fg": "gray30", "text_color": "gray90"},
-        }.get(status, {"text": "عادي", "fg": "gray30", "text_color": "gray90"})
+            "priority": {"text": "Priority", "fg": "#2fa572", "text_color": "white"},
+            "blocked": {"text": "Blocked", "fg": "#c0392b", "text_color": "white"},
+            "normal": {"text": "Normal", "fg": "gray30", "text_color": "gray90"},
+        }.get(status, {"text": "Normal", "fg": "gray30", "text_color": "gray90"})
 
         self.badge.configure(
             text=badge_config["text"],
@@ -58,7 +58,7 @@ class NetPriorityApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("NetPriority — إدارة أولوية الإنترنت")
+        self.title("NetPriority — Internet Priority Manager")
         self.geometry("560x640")
         self.minsize(480, 500)
 
@@ -76,42 +76,42 @@ class NetPriorityApp(ctk.CTk):
 
     def _build_layout(self):
         header = ctk.CTkLabel(
-            self, text="🌐 NetPriority",
+            self, text="NetPriority",
             font=ctk.CTkFont(size=22, weight="bold"),
         )
         header.pack(pady=(16, 4))
 
         self.status_label = ctk.CTkLabel(
-            self, text="جاري فحص التطبيقات...", text_color="gray70"
+            self, text="Scanning applications...", text_color="gray70"
         )
         self.status_label.pack(pady=(0, 10))
 
         picker_frame = ctk.CTkFrame(self)
         picker_frame.pack(fill="x", padx=16, pady=(0, 8))
 
-        ctk.CTkLabel(picker_frame, text="تطبيق الأولوية:").pack(
+        ctk.CTkLabel(picker_frame, text="Priority App:").pack(
             side="right", padx=8, pady=8
         )
         self.priority_menu = ctk.CTkOptionMenu(
             picker_frame, variable=self.selected_priority_app,
-            values=["-- اختر تطبيق --"],
+            values=["-- Select App --"],
         )
         self.priority_menu.pack(side="right", padx=8, pady=8, fill="x", expand=True)
 
-        self.list_frame = ctk.CTkScrollableFrame(self, label_text="التطبيقات النشطة")
+        self.list_frame = ctk.CTkScrollableFrame(self, label_text="Active Applications")
         self.list_frame.pack(fill="both", expand=True, padx=16, pady=8)
 
         btn_frame = ctk.CTkFrame(self, fg_color="transparent")
         btn_frame.pack(fill="x", padx=16, pady=(4, 16))
 
         self.activate_btn = ctk.CTkButton(
-            btn_frame, text=" تفعيل وضع الأولوية",
+            btn_frame, text="Enable Priority Mode",
             command=self._on_activate, fg_color="#2fa572", hover_color="#248a5c",
         )
         self.activate_btn.pack(side="right", padx=4, expand=True, fill="x")
 
         self.reset_btn = ctk.CTkButton(
-            btn_frame, text=" إعادة ضبط الكل",
+            btn_frame, text="Reset All",
             command=self._on_reset, fg_color="#c0392b", hover_color="#992d22",
         )
         self.reset_btn.pack(side="right", padx=4, expand=True, fill="x")
@@ -119,7 +119,7 @@ class NetPriorityApp(ctk.CTk):
     def _check_admin_and_leftovers(self):
         if not firewall_controller.is_admin():
             self.status_label.configure(
-                text=" شغّل البرنامج كـ Administrator عشان يقدر يتحكم بالجدار الناري",
+                text="Please run the app as Administrator to control Windows Firewall",
                 text_color="#e67e22",
             )
             self.activate_btn.configure(state="disabled")
@@ -131,7 +131,7 @@ class NetPriorityApp(ctk.CTk):
             state_manager.clear_state()
             self.blocked_apps = set()
             self.status_label.configure(
-                text=f"تم تنظيف {len(leftover)} حظر عالق من تشغيل سابق ",
+                text=f"Cleaned up {len(leftover)} leftover blocks from previous session",
                 text_color="#2fa572",
             )
 
@@ -143,7 +143,7 @@ class NetPriorityApp(ctk.CTk):
 
     def _render_app_list(self, apps):
         current_names = sorted(apps.keys(), key=lambda n: n.lower())
-        menu_values = current_names if current_names else ["لا توجد تطبيقات نشطة"]
+        menu_values = current_names if current_names else ["No active applications"]
         
         if list(self.priority_menu._values) != menu_values:
             self.priority_menu.configure(values=menu_values)
@@ -154,7 +154,7 @@ class NetPriorityApp(ctk.CTk):
             self.app_rows.clear()
             
             if not hasattr(self, "no_apps_label") or not self.no_apps_label.winfo_exists():
-                self.no_apps_label = ctk.CTkLabel(self.list_frame, text="ما فيه تطبيقات تستخدم النت حاليًا")
+                self.no_apps_label = ctk.CTkLabel(self.list_frame, text="No applications using the network currently")
                 self.no_apps_label.pack(pady=20)
             return
         else:
@@ -201,14 +201,14 @@ class NetPriorityApp(ctk.CTk):
 
         if not self.priority_mode_active:
             self.status_label.configure(
-                text=f"{len(current_names)} تطبيق نشط — وضع الأولوية متوقف",
+                text=f"{len(current_names)} active apps — Priority mode is off",
                 text_color="gray70",
             )
 
     def _on_activate(self):
         priority_name = self.selected_priority_app.get()
-        if not priority_name or priority_name.startswith("--") or priority_name.startswith("لا توجد"):
-            self.status_label.configure(text="اختر تطبيق أولوية أولاً", text_color="#e67e22")
+        if not priority_name or priority_name.startswith("--") or priority_name.startswith("No active"):
+            self.status_label.configure(text="Please select a priority app first", text_color="#e67e22")
             return
 
         apps = network_monitor.get_playable_apps(network_monitor.get_active_apps())
@@ -223,7 +223,7 @@ class NetPriorityApp(ctk.CTk):
 
         self.priority_mode_active = True
         self.status_label.configure(
-            text=f" وضع الأولوية شغّال — تم حظر {blocked_count} تطبيق مؤقتًا",
+            text=f"Priority mode active — Blocked {blocked_count} apps temporarily",
             text_color="#2fa572",
         )
 
@@ -234,7 +234,7 @@ class NetPriorityApp(ctk.CTk):
             state_manager.remove_blocked_app(app_name)
         
         self.status_label.configure(
-            text=f"تم فك الحظر عن التطبيق: {app_name} بنجاح ",
+            text=f"Successfully unblocked application: {app_name}",
             text_color="#2fa572",
         )
 
@@ -244,8 +244,8 @@ class NetPriorityApp(ctk.CTk):
         state_manager.clear_state()
         self.priority_mode_active = False
         if clear_priority:
-            self.selected_priority_app.set("-- اختر تطبيق --")
-        self.status_label.configure(text="تم رجوع كل شي طبيعي ", text_color="gray70")
+            self.selected_priority_app.set("-- Select App --")
+        self.status_label.configure(text="Everything restored to normal", text_color="gray70")
 
     def _on_close(self):
         if self.blocked_apps:
