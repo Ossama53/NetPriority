@@ -41,8 +41,8 @@ Administrator privileges, the user must manually select "Run as Administrator"
 | File | Function |
 |---|---|
 | `main.py` | Entry point + safe shutdown handlers (atexit/signal) |
-| | `network_monitor.py` | Detects active network applications using `psutil` |
-| `firewall_controller.py` | Adds/removes blocking rules via `netsh` |
+| `network_monitor.py` | Detects active network applications via psutil |
+| `firewall_controller.py` | Adds/removes blocking rules via netsh |
 | `state_manager.py` | Saves current blocking state (crash recovery) |
 | `ui.py` | Graphical User Interface (CustomTkinter) |
 | `config.py` | Constants and list of protected system processes |
