@@ -1,64 +1,55 @@
 # NetPriority
 
-A Windows tool that lets you designate a specific application, game, or download as the "priority,"
-temporarily blocking other applications from accessing the internet. This prevents large downloads
-or background updates from slowing down the task that actually matters to you.
+A small Windows tool that gives one app the internet to itself. Pick the app that matters (a game, a download, a call), and NetPriority blocks the other apps that are currently using the network, so background updates stop eating your bandwidth.
 
->  **Windows only.** It relies on `netsh advfirewall` and must be
-> run with **Administrator** privileges; otherwise, it cannot detect all applications
-> or control the firewall.
+<!-- Add one or two sentences here about why you built it. -->
 
-## How it works
+**Windows only.** It uses `netsh advfirewall`, so it has to run as Administrator.
 
-- Displays all applications currently using the internet (via `psutil`)
-- You select the "priority" application from the list
-- Click "Activate Priority Mode" → Temporarily blocks other applications using
-Windows Firewall rules, giving your selected application exclusive access to the internet
-- Click "Reset All" or close the program → Everything automatically returns to normal
+## How to use it
 
-## Installation and Execution
+1. Run the app as Administrator.
+2. Choose your priority app from the dropdown (it lists apps that are using the network right now).
+3. Click **Enable Priority Mode**. Every other app on the list gets a firewall block rule.
+4. Click **Reset All** (or just close the window) to put everything back to normal.
 
-```powershell
+## Run it
+
+```
 pip install -r requirements.txt
 python main.py
 ```
 
-**Must be run as Administrator**: Right-click your terminal (PowerShell
-or CMD), select "Run as Administrator," and then execute the command above.
+Open PowerShell or CMD with "Run as administrator" first.
 
-## Packaging as an .exe (Optional)
+To build an `.exe`:
 
-```powershell
+```
 pyinstaller --onefile --windowed --name NetPriority main.py
 ```
 
-The resulting file will be located at `dist/NetPriority.exe`. Since the program requires
-Administrator privileges, the user must manually select "Run as Administrator"
-(or you can add a manifest later to request this automatically).
+The result is in `dist/NetPriority.exe`. You still need to right-click it and choose "Run as administrator".
 
-## File Structure
+## Files
 
-| File | Function |
-|---|---|
-| `main.py` | Entry point + safe shutdown handlers (atexit/signal) |
-| `network_monitor.py` | Detects active network applications via psutil |
-| `firewall_controller.py` | Adds/removes blocking rules via netsh |
-| `state_manager.py` | Saves current blocking state (crash recovery) |
-| `ui.py` | Graphical User Interface (CustomTkinter) |
-| `config.py` | Constants and list of protected system processes |
+- `main.py` - starts the app and makes sure blocks are removed on exit
+- `ui.py` - the window (CustomTkinter)
+- `network_monitor.py` - finds apps using the network (psutil)
+- `firewall_controller.py` - adds and removes the `netsh` rules
+- `state_manager.py` - remembers what is blocked, so a crash can be cleaned up next launch
+- `config.py` - constants and the list of protected system processes
 
-## Important Security Notes
+## Safety
 
-- All blocking rules are prefixed with `NetPriority_Block_` to make them easy to identify
-and remove, ensuring they do not interfere with your other firewall rules.
-- Critical system processes (`svchost.exe`, `explorer.exe`, etc.) are automatically
-excluded from the block list (see `config.py` → `PROTECTED_PROCESSES`).
-- If the program crashes or closes unexpectedly, it detects any lingering
-blocks upon the next launch and automatically cleans them up.
+- Every rule is named `NetPriority_Block_<app>`, so they are easy to find and don't touch your other firewall rules.
+- System processes like `svchost.exe` and `explorer.exe` are never blocked.
+- If the app crashes, leftover blocks are removed the next time you start it.
 
-## Proposed Future Enhancements
+## Limitations
 
-- Automatic timer (e.g., priority mode turns off after 30 minutes)
-- Preset profiles ("Gaming," "Download") to block groups of applications at once
-- Digital signature for the executable to reduce antivirus warnings
-- Windows notifications when priority mode starts or ends
+- Only apps that are already using the network when you click Enable get blocked. Apps that start later are not.
+- Cleanup by rule name reads `netsh` output in English, so it may not work on a non-English Windows.
+
+## License
+
+MIT
