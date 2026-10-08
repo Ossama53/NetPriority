@@ -1,4 +1,18 @@
-# NetPriority
+<p align="center">
+  <img src="assets/logo.svg" width="160" alt="NetPriority logo">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0-0077b6" alt="version 1.0.0">
+  <img src="https://img.shields.io/badge/platform-Windows-0078d4" alt="platform Windows">
+  <img src="https://img.shields.io/badge/language-Python-3776ab" alt="language Python">
+  <img src="https://img.shields.io/badge/powered%20by-psutil-2de2c0" alt="powered by psutil">
+  <img src="https://img.shields.io/badge/license-MIT-4c9a2a" alt="license MIT">
+</p>
+
+<h1 align="center">NetPriority</h1>
+
+<p align="center"><b>Give one app the internet to itself</b></p>
 
 A small Windows tool that gives one app the internet to itself. Pick the app that matters (a game, a download, a call), and NetPriority blocks the other apps that are currently using the network, so background updates stop eating your bandwidth.
 
